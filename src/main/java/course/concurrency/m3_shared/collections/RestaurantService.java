@@ -4,6 +4,8 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentSkipListSet;
+import java.util.stream.Collectors;
 
 public class RestaurantService {
 
@@ -13,7 +15,7 @@ public class RestaurantService {
         put("C", new Restaurant("C"));
     }};
 
-    private Object stat;
+    private ConcurrentHashMap<String, Integer> stat = new ConcurrentHashMap<>();
 
     public Restaurant getByName(String restaurantName) {
         addToStat(restaurantName);
@@ -21,11 +23,12 @@ public class RestaurantService {
     }
 
     public void addToStat(String restaurantName) {
-        // your code
+        stat.compute(restaurantName, (k, v) -> v == null ? 1 : v + 1);
     }
 
     public Set<String> printStat() {
-        // your code
-        return new HashSet<>();
+        return stat.entrySet().stream()
+            .map(e -> e.getKey() + " - " + e.getValue())
+            .collect(Collectors.toSet());
     }
 }
