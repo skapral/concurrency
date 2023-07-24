@@ -8,59 +8,88 @@ public class Order {
 
     public enum Status { NEW, IN_PROGRESS, DELIVERED }
 
-    private Long id;
-    private List<Item> items;
-    private PaymentInfo paymentInfo;
-    private boolean isPacked;
-    private Status status;
+    private final Long id;
+    private final List<Item> items;
+    private final PaymentInfo paymentInfo;
+    private final boolean isPacked;
+    private final Status status;
 
-    public Order(List<Item> items) {
+    public Order(Long id, List<Item> items, PaymentInfo paymentInfo, boolean isPacked, Status status) {
+        this.id = id;
         this.items = items;
-        this.status = NEW;
+        this.paymentInfo = paymentInfo;
+        this.isPacked = isPacked;
+        this.status = status;
     }
 
-    public synchronized boolean checkStatus() {
+    public static Order createNew(Long id, List<Item> items) {
+        return new Order(
+            id,
+            items,
+            null,
+            false,
+            NEW
+        );
+    }
+
+    public final boolean checkStatus() {
         if (items != null && !items.isEmpty() && paymentInfo != null && isPacked) {
             return true;
         }
         return false;
     }
 
-    public Long getId() {
+    public final Long getId() {
         return id;
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public final Order withId(Long id) {
+        return new Order(id, items, paymentInfo, isPacked, status);
     }
 
-    public List<Item> getItems() {
+    public final List<Item> getItems() {
         return items;
     }
 
-    public PaymentInfo getPaymentInfo() {
+    public final PaymentInfo getPaymentInfo() {
         return paymentInfo;
     }
 
-    public void setPaymentInfo(PaymentInfo paymentInfo) {
-        this.paymentInfo = paymentInfo;
-        this.status = Status.IN_PROGRESS;
+    public final Order withPaymentInfo(PaymentInfo paymentInfo) {
+        return new Order(
+            id,
+            items,
+            paymentInfo,
+            isPacked,
+            Status.IN_PROGRESS
+        );
     }
 
-    public boolean isPacked() {
+    public final boolean isPacked() {
         return isPacked;
     }
 
-    public void setPacked(boolean packed) {
-        isPacked = packed;
-        this.status = Status.IN_PROGRESS;
+    public final Order withPacked(boolean packed) {
+        return new Order(
+            id,
+            items,
+            paymentInfo,
+            packed,
+            Status.IN_PROGRESS
+        );
     }
 
-    public Status getStatus() {
+    public final Status getStatus() {
         return status;
     }
 
-    public void setStatus(Status status) {
-        this.status = status;
+    public final Order withStatus(Status status) {
+        return new Order(
+            id,
+            items,
+            paymentInfo,
+            isPacked,
+            status
+        );
     }
 }
