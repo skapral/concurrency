@@ -22,21 +22,21 @@ public class OrderService {
     }
 
     public final void updatePaymentInfo(long orderId, PaymentInfo paymentInfo) {
-        currentOrders.computeIfPresent(
+        Order order = currentOrders.computeIfPresent(
             orderId,
             (k, v) -> v.withPaymentInfo(paymentInfo)
         );
-        if (currentOrders.get(orderId).checkStatus()) {
+        if (order.checkStatus()) {
             deliver(currentOrders.get(orderId));
         }
     }
 
     public final void setPacked(long orderId) {
-        currentOrders.computeIfPresent(
+        Order order = currentOrders.computeIfPresent(
             orderId,
             (k, v) -> v.withPacked(true)
         );
-        if (currentOrders.get(orderId).checkStatus()) {
+        if (order.checkStatus()) {
             deliver(currentOrders.get(orderId));
         }
     }
