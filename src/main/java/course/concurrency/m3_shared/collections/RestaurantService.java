@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentSkipListSet;
+import java.util.concurrent.atomic.LongAdder;
 import java.util.stream.Collectors;
 
 public class RestaurantService {
@@ -15,7 +16,7 @@ public class RestaurantService {
         put("C", new Restaurant("C"));
     }};
 
-    private ConcurrentHashMap<String, Integer> stat = new ConcurrentHashMap<>();
+    private ConcurrentHashMap<String, LongAdder> stat = new ConcurrentHashMap<>();
 
     public Restaurant getByName(String restaurantName) {
         addToStat(restaurantName);
@@ -23,7 +24,8 @@ public class RestaurantService {
     }
 
     public void addToStat(String restaurantName) {
-        stat.compute(restaurantName, (k, v) -> v == null ? 1 : v + 1);
+        LongAdder v = stat.computeIfAbsent(restaurantName, k -> new LongAdder());
+        v.add(1);
     }
 
     public Set<String> printStat() {
