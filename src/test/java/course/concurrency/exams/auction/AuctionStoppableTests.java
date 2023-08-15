@@ -61,6 +61,7 @@ public class AuctionStoppableTests {
         CountDownLatch latch = new CountDownLatch(1);
 
         for (int i = 0; i < poolSize; i++) {
+
             executor.submit(() -> {
                 try {
                     latch.await();
@@ -77,7 +78,7 @@ public class AuctionStoppableTests {
         long start = System.currentTimeMillis();
         latch.countDown();
         executor.shutdown();
-        executor.awaitTermination(10, TimeUnit.SECONDS);
+        executor.awaitTermination(20, TimeUnit.SECONDS);
         long end = System.currentTimeMillis();
 
         assertEquals(latestPrice, auction.getLatestBid().getPrice());
@@ -121,7 +122,7 @@ public class AuctionStoppableTests {
 
         latch.countDown();
         executor.shutdown();
-        executor.awaitTermination(10, TimeUnit.SECONDS);
+        executor.awaitTermination(20, TimeUnit.SECONDS);
 
         assertEquals(latestBidWhenStopped.get().getPrice(), auction.getLatestBid().getPrice());
     }

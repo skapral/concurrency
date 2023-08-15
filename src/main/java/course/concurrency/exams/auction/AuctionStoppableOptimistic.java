@@ -15,7 +15,7 @@ public class AuctionStoppableOptimistic implements AuctionStoppable {
         this.notifier = notifier;
     }
 
-    private Bid latestBid;
+    private Bid latestBid = new Bid(null, null, 0L);
 
     public boolean propose(Bid bid) {
         if(!stopped && lock.writeLock().tryLock()) {
@@ -23,7 +23,6 @@ public class AuctionStoppableOptimistic implements AuctionStoppable {
                 if (bid.getPrice() > latestBid.getPrice()) {
                     notifier.sendOutdatedMessage(latestBid);
                     latestBid = bid;
-                    log.info("latestBid updated to " + latestBid.getPrice());
                     return true;
                 }
             } finally {

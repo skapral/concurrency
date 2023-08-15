@@ -45,19 +45,22 @@ public class AuctionTests {
     }
 
     @RepeatedTest(TEST_COUNT)
-    public void testOptimistic() throws InterruptedException {
-        Auction auction = new AuctionOptimistic(notifier);
-        testCorrectLatestBid(auction, "optimistic");
-    }
-
-    @RepeatedTest(TEST_COUNT)
     public void testPessimistic() throws InterruptedException {
         Auction auction = new AuctionPessimistic(notifier);
         testCorrectLatestBid(auction, "pessimistic");
     }
 
+    @RepeatedTest(TEST_COUNT)
+    public void testOptimistic() throws InterruptedException {
+        Auction auction = new AuctionOptimistic(notifier);
+        testCorrectLatestBid(auction, "optimistic");
+    }
+
+
+
     public void testCorrectLatestBid(Auction auction, String tag) throws InterruptedException {
         CountDownLatch latch = new CountDownLatch(1);
+
         for (int i = 0; i < poolSize; i++) {
 
             executor.submit(() -> {
