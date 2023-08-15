@@ -9,8 +9,6 @@ import java.util.concurrent.locks.ReentrantLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 public class AuctionOptimistic implements Auction {
-    private static final Logger log = LoggerFactory.getLogger(AuctionOptimistic.class);
-
     private final Notifier notifier;
 
     public AuctionOptimistic(Notifier notifier) {
