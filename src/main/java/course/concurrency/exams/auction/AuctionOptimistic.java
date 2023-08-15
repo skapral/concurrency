@@ -3,13 +3,13 @@ package course.concurrency.exams.auction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 public class AuctionOptimistic implements Auction {
     private static final Logger log = LoggerFactory.getLogger(AuctionOptimistic.class);
-    private static final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
 
     private final Notifier notifier;
 
@@ -17,29 +17,26 @@ public class AuctionOptimistic implements Auction {
         this.notifier = notifier;
     }
 
-    private Bid latestBid = new Bid(null, null, 0L);
+    private AtomicReference<Bid> latestBidRef = new AtomicReference<>(
+        new Bid(null, null, 0L)
+    );
 
     public boolean propose(Bid bid) {
-        if(lock.writeLock().tryLock()) {
-            try {
-                if (bid.getPrice() > latestBid.getPrice()) {
+        while(true) {
+            Bid latestBid = latestBidRef.get();
+            if (bid.getPrice() > latestBid.getPrice()) {
+                if (latestBidRef.compareAndSet(latestBid, bid)) {
                     notifier.sendOutdatedMessage(latestBid);
-                    latestBid = bid;
                     return true;
+                } else {
+                    continue;
                 }
-            } finally {
-                lock.writeLock().unlock();
             }
+            return false;
         }
-        return false;
     }
 
     public Bid getLatestBid() {
-        try {
-            lock.readLock().lock();
-            return latestBid;
-        } finally {
-            lock.readLock().unlock();
-        }
+        return latestBidRef.get();
     }
 }
